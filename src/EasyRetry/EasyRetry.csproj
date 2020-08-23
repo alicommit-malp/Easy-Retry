@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
-    <TargetFrameworks>netstandard2.0;netcoreapp3.1</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Title>Easily retry your asynchronous operation </Title>
     <Description>Easily retry your asynchronous operation</Description>
@@ -12,7 +11,9 @@
     <PackageLicenseUrl>https://github.com/alicommit-malp/Easy-Retry/blob/master/LICENSE</PackageLicenseUrl>
     <RepositoryUrl>https://github.com/alicommit-malp/Easy-Retry</RepositoryUrl>
     <RepositoryType>GIT</RepositoryType>
-    <PackageTags>Retry Asynchronous </PackageTags>
+    <PackageTags>Async Task Retry Asynchronous </PackageTags>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <PackageVersion>1.1.0</PackageVersion>
   </PropertyGroup>
 
 </Project>

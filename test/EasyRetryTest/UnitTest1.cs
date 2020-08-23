@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using EasyRetry;
 using NUnit.Framework;
@@ -18,7 +20,17 @@ namespace EasyRetryTest
             await Task.Run(() =>
             {
                 var i = 1 / a;
-            }).Retry();
+            }).Retry(new RetryOptions()
+            {
+                Attempts = 3,
+                DelayBetweenRetries = TimeSpan.FromSeconds(3),
+                DelayBeforeFirstTry = TimeSpan.FromSeconds(2),
+                EnableLogging = true,
+                DoNotRetryOnTheseExceptions = new List<Exception>()
+                {
+                    new NullReferenceException()
+                }
+            });
         }
     }
 }
