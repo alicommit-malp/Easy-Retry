@@ -1,7 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <TargetFrameworks>netstandard2.0;netcoreapp3.1</TargetFrameworks>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Title>Easily retry your asynchronous operation </Title>
+    <Description>Easily retry your asynchronous operation</Description>
+    <license>MIT</license>
+    <Copyright>Null</Copyright>
+    <PackageProjectUrl>https://github.com/alicommit-malp/Easy-Retry</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/alicommit-malp/Easy-Retry/blob/master/LICENSE</PackageLicenseUrl>
+    <RepositoryUrl>https://github.com/alicommit-malp/Easy-Retry</RepositoryUrl>
+    <RepositoryType>GIT</RepositoryType>
+    <PackageTags>Retry Asynchronous </PackageTags>
   </PropertyGroup>
 
 </Project>

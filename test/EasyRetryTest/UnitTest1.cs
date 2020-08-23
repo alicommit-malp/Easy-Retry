@@ -1,3 +1,5 @@
+using System.Threading.Tasks;
+using EasyRetry;
 using NUnit.Framework;
 
 namespace EasyRetryTest
@@ -10,9 +12,13 @@ namespace EasyRetryTest
         }
 
         [Test]
-        public void Test1()
+        public async Task Test1()
         {
-            Assert.Pass();
+            var a = 0;
+            await Task.Run(() =>
+            {
+                var i = 1 / a;
+            }).Retry();
         }
     }
 }
