@@ -40,9 +40,9 @@ await Task_NetworkBound().Retry(new RetryOptions()
         DelayBetweenRetries = TimeSpan.FromSeconds(3),
         DelayBeforeFirstTry = TimeSpan.FromSeconds(2),
         EnableLogging = true,
-        DoNotRetryOnTheseExceptions = new List<Exception>()
+        DoNotRetryOnTheseExceptionTypes = new List<Type>()
         {
-            new NullReferenceException()
+            typeof(NullReferenceException)
         }
     }
 );

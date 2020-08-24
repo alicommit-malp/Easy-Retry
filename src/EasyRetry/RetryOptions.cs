@@ -9,6 +9,6 @@ namespace EasyRetry
         public TimeSpan DelayBeforeFirstTry { get; set; } = TimeSpan.FromSeconds(0);
         public int Attempts { get; set; } = 2;
         public bool EnableLogging { get; set; } = false;
-        public List<Exception> DoNotRetryOnTheseExceptions { get; set; } = new List<Exception>();
+        public List<Type> DoNotRetryOnTheseExceptionTypes { get; set; } = new List<Type>();
     }
 }

@@ -39,7 +39,7 @@ namespace EasyRetry
                                          $"Stack: {ex.StackTrace} ");
                     currentRetry++;
                     if (currentRetry > retryOptions.Attempts ||
-                        retryOptions.DoNotRetryOnTheseExceptions.Any(z => z.GetType() == ex.GetType()))
+                        retryOptions.DoNotRetryOnTheseExceptionTypes.Any(z => z == ex.GetType()))
                     {
                         throw;
                     }
