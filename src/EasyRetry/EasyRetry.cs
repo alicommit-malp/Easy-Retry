@@ -1,21 +1,21 @@
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace EasyRetry
 {
-    public static class EasyRetryTaskExtension
+    public class EasyRetry : IEasyRetry
     {
-        public static async ValueTask Retry(this ValueTask task, RetryOptions retryOptions = null)
+        private readonly ILogger _logger;
+
+        public EasyRetry(ILogger<EasyRetry> logger)
         {
-            var tasks = new Queue<ValueTask>();
-            tasks.Enqueue(task);
-            tasks.Enqueue(task);
+            _logger = logger;
+        }
 
-
+        public async Task<T> Retry<T>(Func<Task<T>> func, RetryOptions retryOptions = null)
+        {
             retryOptions ??= new RetryOptions();
             var currentRetry = 1;
 
@@ -24,19 +24,20 @@ namespace EasyRetry
                 try
                 {
                     if (currentRetry > 1 && retryOptions.EnableLogging)
-                        Trace.TraceInformation($"Retrying attempt {currentRetry}");
+                        _logger.LogInformation($"Retrying attempt {currentRetry} ... ");
                     await Task.Delay(retryOptions.DelayBeforeFirstTry);
 
-                    await tasks.Dequeue();
-                    break;
+                    return await func.Invoke();
                 }
                 catch (Exception ex)
                 {
                     if (retryOptions.EnableLogging)
-                        Trace.TraceError(
-                            $"Operation Exception see the inner exception for the details ----> " +
+                        _logger.LogInformation(
+                            $"Attempt {currentRetry} has failed. " +
+                            $"see the inner exception for the details ----> " +
                             $"Message: {ex.Message} " +
                             $"Stack: {ex.StackTrace} ");
+
                     currentRetry++;
                     if (currentRetry > retryOptions.Attempts ||
                         retryOptions.DoNotRetryOnTheseExceptionTypes.Any(z => z == ex.GetType()))
@@ -49,22 +50,9 @@ namespace EasyRetry
             }
         }
 
-        /// <summary>
-        /// An extension method to provide Retry functionality for any asynchronous TASK
-        /// </summary>
-        /// <param name="task">The extension target type</param>
-        /// <param name="retryOptions">The options for the retry algorithm</param>
-        /// <returns>a task responsible for the retry operation</returns>
-        public static async Task<T> Retry<T>(this Task<T> task, RetryOptions retryOptions = null)
+        public T Retry<T>(Func<T> func, RetryOptions retryOptions = null)
         {
-            
             retryOptions ??= new RetryOptions();
-            var tasks = new Queue<Task<T>>();
-            for (int i = 0; i < retryOptions.Attempts; i++)
-            {
-                tasks.Enqueue(task);
-            }
-
             var currentRetry = 1;
 
             for (;;)
@@ -72,19 +60,20 @@ namespace EasyRetry
                 try
                 {
                     if (currentRetry > 1 && retryOptions.EnableLogging)
-                        Trace.TraceInformation($"Retrying attempt {currentRetry}");
-                    await Task.Delay(retryOptions.DelayBeforeFirstTry);
+                        _logger.LogInformation($"Retrying attempt {currentRetry} ... ");
+                    Task.Delay(retryOptions.DelayBeforeFirstTry).GetAwaiter().GetResult();
 
-                    var result= await tasks.Dequeue();
-                    return result;
+                    return func.Invoke();
                 }
                 catch (Exception ex)
                 {
                     if (retryOptions.EnableLogging)
-                        Trace.TraceError(
-                            $"Operation Exception see the inner exception for the details ----> " +
+                        _logger.LogInformation(
+                            $"Attempt {currentRetry} has failed. " +
+                            $"see the inner exception for the details ----> " +
                             $"Message: {ex.Message} " +
                             $"Stack: {ex.StackTrace} ");
+
                     currentRetry++;
                     if (currentRetry > retryOptions.Attempts ||
                         retryOptions.DoNotRetryOnTheseExceptionTypes.Any(z => z == ex.GetType()))
@@ -93,23 +82,12 @@ namespace EasyRetry
                     }
                 }
 
-                await Task.Delay(retryOptions.DelayBetweenRetries);
+                Task.Delay(retryOptions.DelayBetweenRetries).GetAwaiter().GetResult();
             }
         }
 
-        /// <summary>
-        /// An extension method to provide Retry functionality for any asynchronous TASK
-        /// </summary>
-        /// <param name="task">The extension target type</param>
-        /// <param name="retryOptions">The options for the retry algorithm</param>
-        /// <returns>a task responsible for the retry operation</returns>
-        public static async Task Retry(this Action action, RetryOptions retryOptions = null)
+        public async Task Retry(Func<Task> func, RetryOptions retryOptions = null)
         {
-            var tasks = new Queue<Action>();
-            tasks.Enqueue(action);
-            tasks.Enqueue(action);
-
-
             retryOptions ??= new RetryOptions();
             var currentRetry = 1;
 
@@ -118,19 +96,20 @@ namespace EasyRetry
                 try
                 {
                     if (currentRetry > 1 && retryOptions.EnableLogging)
-                        Trace.TraceInformation($"Retrying attempt {currentRetry}");
+                        _logger.LogInformation($"Retrying attempt {currentRetry} ... ");
                     await Task.Delay(retryOptions.DelayBeforeFirstTry);
 
-                    await new Task(tasks.Dequeue());
-                    break;
+                    await func.Invoke();
                 }
                 catch (Exception ex)
                 {
                     if (retryOptions.EnableLogging)
-                        Trace.TraceError(
-                            $"Operation Exception see the inner exception for the details ----> " +
+                        _logger.LogInformation(
+                            $"Attempt {currentRetry} has failed. " +
+                            $"see the inner exception for the details ----> " +
                             $"Message: {ex.Message} " +
                             $"Stack: {ex.StackTrace} ");
+
                     currentRetry++;
                     if (currentRetry > retryOptions.Attempts ||
                         retryOptions.DoNotRetryOnTheseExceptionTypes.Any(z => z == ex.GetType()))
