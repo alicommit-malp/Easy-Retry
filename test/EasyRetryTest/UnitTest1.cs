@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using EasyRetry;
@@ -21,14 +22,19 @@ namespace EasyRetryTest
         [Test]
         public async Task Test()
         {
-            var result = await _easyRetry.Retry(async () =>
-            {
-                var response = await new HttpClient().GetAsync("http://localhost:8080/");
-                response.EnsureSuccessStatusCode();
-                return await response.Content.ReadAsStringAsync();
-            }, new RetryOptions() {Attempts = 3, EnableLogging = true});
-
-            Logger.LogInformation(result);
+            Assert.ThrowsAsync<HttpRequestException>(async () =>
+                {
+                    var result = await _easyRetry.Retry(async () =>
+                    {
+                        var response =
+                            await new HttpClient().GetAsync(
+                                "http://aaaaaaaaaasdhakdkaczxnkjhasdihaoajlsljasjdjaslkjasaa.com/");
+                        response.EnsureSuccessStatusCode();
+                        return await response.Content.ReadAsStringAsync();
+                    }, new RetryOptions() {Attempts = 3, EnableLogging = true});
+                    Logger.LogInformation(result);
+                }
+            );
         }
 
 
@@ -36,40 +42,42 @@ namespace EasyRetryTest
         public async Task TestFailThenSucceed()
         {
             var iteration = 1;
-            await _easyRetry.Retry(async () =>
+            await _easyRetry.Retry(() =>
             {
                 Logger.LogInformation($"{nameof(iteration)}:{iteration}");
                 if (iteration++ == 1)
                 {
                     throw new Exception();
                 }
+
+                return Task.CompletedTask;
             }, new RetryOptions() {EnableLogging = true});
         }
 
-        // [Test]
-        // public void Test1()
-        // {
-        //     Assert.ThrowsAsync<DivideByZeroException>(async () =>
-        //     {
-        //         var counter = 1;
-        //         await new Task(() =>
-        //         {
-        //             Logger.LogInformation($"{nameof(counter)}:{counter++}");
-        //             var zero = 0;
-        //             var result = 1 / zero;
-        //         }).Retry(
-        //             new RetryOptions()
-        //             {
-        //                 Attempts = 3,
-        //                 DelayBetweenRetries = TimeSpan.FromSeconds(3),
-        //                 DelayBeforeFirstTry = TimeSpan.FromSeconds(2),
-        //                 EnableLogging = true,
-        //                 DoNotRetryOnTheseExceptionTypes = new List<Type>()
-        //                 {
-        //                     typeof(NullReferenceException)
-        //                 }
-        //             });
-        //     });
-        // }
+        [Test]
+        public void TestWithAllOptions()
+        {
+            Assert.ThrowsAsync<DivideByZeroException>(async () =>
+            {
+                await _easyRetry.Retry(() =>
+                    {
+                        {
+                            var zero = 0;
+                            var result = 1 / zero;
+                        }
+                    },
+                    new RetryOptions()
+                    {
+                        Attempts = 3,
+                        DelayBetweenRetries = TimeSpan.FromSeconds(3),
+                        DelayBeforeFirstTry = TimeSpan.FromSeconds(2),
+                        EnableLogging = true,
+                        DoNotRetryOnTheseExceptionTypes = new List<Type>()
+                        {
+                            typeof(NullReferenceException)
+                        }
+                    });
+            });
+        }
     }
 }

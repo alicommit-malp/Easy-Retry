@@ -9,11 +9,29 @@ namespace EasyRetry
     {
         private readonly ILogger _logger;
 
+        /// <summary>
+        /// For normal instantiation 
+        /// </summary>
+        public EasyRetry()
+        {
+        }
+        
+        /// <summary>
+        /// For DI instantiation 
+        /// </summary>
+        /// <param name="logger"></param>
         public EasyRetry(ILogger<EasyRetry> logger)
         {
             _logger = logger;
         }
 
+        /// <summary>
+        /// Will retry the given <see cref="Func{TResult}"/> asynchronously
+        /// </summary>
+        /// <param name="func"><see cref="Func{TResult}"/></param>
+        /// <param name="retryOptions"><see cref="RetryOptions"/></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns><see cref="T"/>Type</returns>
         public async Task<T> Retry<T>(Func<Task<T>> func, RetryOptions retryOptions = null)
         {
             retryOptions ??= new RetryOptions();
@@ -24,7 +42,7 @@ namespace EasyRetry
                 try
                 {
                     if (currentRetry > 1 && retryOptions.EnableLogging)
-                        _logger.LogInformation($"Retrying attempt {currentRetry} ... ");
+                        _logger?.LogInformation($"Retrying attempt {currentRetry} ... ");
                     await Task.Delay(retryOptions.DelayBeforeFirstTry);
 
                     return await func.Invoke();
@@ -32,7 +50,7 @@ namespace EasyRetry
                 catch (Exception ex)
                 {
                     if (retryOptions.EnableLogging)
-                        _logger.LogInformation(
+                        _logger?.LogInformation(
                             $"Attempt {currentRetry} has failed. " +
                             $"see the inner exception for the details ----> " +
                             $"Message: {ex.Message} " +
@@ -50,6 +68,13 @@ namespace EasyRetry
             }
         }
 
+        /// <summary>
+        /// Will retry the given <see cref="Func{TResult}"/>
+        /// </summary>
+        /// <param name="func"><see cref="Func{TResult}"/></param>
+        /// <param name="retryOptions"><see cref="RetryOptions"/></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns><see cref="T"/>Type</returns>
         public T Retry<T>(Func<T> func, RetryOptions retryOptions = null)
         {
             retryOptions ??= new RetryOptions();
@@ -60,7 +85,7 @@ namespace EasyRetry
                 try
                 {
                     if (currentRetry > 1 && retryOptions.EnableLogging)
-                        _logger.LogInformation($"Retrying attempt {currentRetry} ... ");
+                        _logger?.LogInformation($"Retrying attempt {currentRetry} ... ");
                     Task.Delay(retryOptions.DelayBeforeFirstTry).GetAwaiter().GetResult();
 
                     return func.Invoke();
@@ -68,7 +93,7 @@ namespace EasyRetry
                 catch (Exception ex)
                 {
                     if (retryOptions.EnableLogging)
-                        _logger.LogInformation(
+                        _logger?.LogInformation(
                             $"Attempt {currentRetry} has failed. " +
                             $"see the inner exception for the details ----> " +
                             $"Message: {ex.Message} " +
@@ -86,7 +111,13 @@ namespace EasyRetry
             }
         }
 
-        public async Task Retry(Func<Task> func, RetryOptions retryOptions = null)
+        /// <summary>
+        /// Will retry the given <see cref="Action"/>
+        /// </summary>
+        /// <param name="action">The desired action to be retried with the specified <see cref="RetryOptions"/></param>
+        /// <param name="retryOptions"><see cref="RetryOptions"/></param>
+        /// <returns></returns>
+        public async Task Retry(Action action, RetryOptions retryOptions = null)
         {
             retryOptions ??= new RetryOptions();
             var currentRetry = 1;
@@ -96,15 +127,15 @@ namespace EasyRetry
                 try
                 {
                     if (currentRetry > 1 && retryOptions.EnableLogging)
-                        _logger.LogInformation($"Retrying attempt {currentRetry} ... ");
+                        _logger?.LogInformation($"Retrying attempt {currentRetry} ... ");
                     await Task.Delay(retryOptions.DelayBeforeFirstTry);
 
-                    await func.Invoke();
+                    action.Invoke();
                 }
                 catch (Exception ex)
                 {
                     if (retryOptions.EnableLogging)
-                        _logger.LogInformation(
+                        _logger?.LogInformation(
                             $"Attempt {currentRetry} has failed. " +
                             $"see the inner exception for the details ----> " +
                             $"Message: {ex.Message} " +
