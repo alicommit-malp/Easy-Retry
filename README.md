@@ -17,7 +17,7 @@ Install-Package EasyRetry
 
 ## Usage
 
-Let's say there is a Http Task which you need to retry in case it fails 
+Let's say there is a HTTP Task which you need to retry in case it fails 
 
 ```c#
 private async Task Task_NetworkBound()
@@ -35,7 +35,7 @@ await _easyRetry.Retry(async () => await Task_NetworkBound());
 await new EasyRetry().Retry(async () => await Task_NetworkBound());
 ```
 
-Or you can use the retry options to customize the behaviour of the retry algorithm as follows 
+Or you can use the retry options to customize the behavior of the retry algorithm as follows 
 
 ```c#
 await _easyRetry.Retry(async () => await Task_NetworkBound()
