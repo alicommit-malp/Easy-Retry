@@ -37,29 +37,78 @@ namespace EasyRetryTest
             );
         }
 
+        private async Task Task_NetworkBound_With_Await()
+        {
+            await new HttpClient().GetStringAsync("https://dotnetfoundation2222222hh2h222.org");
+        }
+
+        [Test]
+        public async Task TestAsyncFunctionCallWithAwait()
+        {
+            Assert.ThrowsAsync<HttpRequestException>(async () =>
+            {
+                await _easyRetry.Retry(async () => await Task_NetworkBound_With_Await(), new RetryOptions()
+                {
+                    EnableLogging = true,
+                    Attempts = 3
+                });
+            });
+        }
+
+        private Task Task_NetworkBound()
+        {
+            return new HttpClient().GetStringAsync("https://dotnetfoundation2222222hh2h222.org");
+        }
+
+        [Test]
+        public async Task TestAsyncFunctionCall()
+        {
+            Assert.ThrowsAsync<HttpRequestException>(async () =>
+            {
+                await new EasyRetry.EasyRetry().Retry(async () => await Task_NetworkBound());
+            });
+        }
+
+        [Test]
+        public async Task TestAsyncFunctionCallFullOptions()
+        {
+            Assert.ThrowsAsync<HttpRequestException>(async () =>
+            {
+                await _easyRetry.Retry(async () => await Task_NetworkBound()
+                    , new RetryOptions()
+                    {
+                        Attempts = 3,
+                        DelayBetweenRetries = TimeSpan.FromSeconds(3),
+                        DelayBeforeFirstTry = TimeSpan.FromSeconds(2),
+                        EnableLogging = true,
+                        DoNotRetryOnTheseExceptionTypes = new List<Type>()
+                        {
+                            typeof(NullReferenceException)
+                        }
+                    });
+            });
+        }
 
         [Test]
         public async Task TestFailThenSucceed()
         {
             var iteration = 1;
-            await _easyRetry.Retry(() =>
+            _easyRetry.Retry(() =>
             {
                 Logger.LogInformation($"{nameof(iteration)}:{iteration}");
                 if (iteration++ == 1)
                 {
                     throw new Exception();
                 }
-
-                return Task.CompletedTask;
             }, new RetryOptions() {EnableLogging = true});
         }
 
         [Test]
         public void TestWithAllOptions()
         {
-            Assert.ThrowsAsync<DivideByZeroException>(async () =>
+            Assert.ThrowsAsync<DivideByZeroException>(code: async () =>
             {
-                await _easyRetry.Retry(() =>
+                _easyRetry.Retry(() =>
                     {
                         {
                             var zero = 0;

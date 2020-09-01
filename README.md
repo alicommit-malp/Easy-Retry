@@ -28,13 +28,18 @@ private async Task Task_NetworkBound()
 In order to retry it after 5 seconds you just need to do as follows
 
 ```c#
-await Task_NetworkBound().Retry();
+//With DI
+await _easyRetry.Retry(async () => await Task_NetworkBound());
+
+//Without DI
+await new EasyRetry().Retry(async () => await Task_NetworkBound());
 ```
 
 Or you can use the retry options to customize the behaviour of the retry algorithm as follows 
 
 ```c#
-await Task_NetworkBound().Retry(new RetryOptions()
+await _easyRetry.Retry(async () => await Task_NetworkBound()
+    , new RetryOptions()
     {
         Attempts = 3,
         DelayBetweenRetries = TimeSpan.FromSeconds(3),
@@ -44,8 +49,7 @@ await Task_NetworkBound().Retry(new RetryOptions()
         {
             typeof(NullReferenceException)
         }
-    }
-);
+    });
 ```
 #### [NuGet](https://www.nuget.org/packages/EasyRetry) Installation
 #### [GitHub](https://github.com/alicommit-malp/Easy-Retry) Source Code 
