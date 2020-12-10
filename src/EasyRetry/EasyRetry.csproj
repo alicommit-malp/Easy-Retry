@@ -13,7 +13,7 @@
     <RepositoryType>GIT</RepositoryType>
     <PackageTags>Async Task Retry Asynchronous </PackageTags>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <PackageVersion>2.0.0</PackageVersion>
+    <PackageVersion>2.0.1</PackageVersion>
   </PropertyGroup>
 
   <ItemGroup>
