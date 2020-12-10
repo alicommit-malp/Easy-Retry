@@ -98,6 +98,7 @@ namespace EasyRetry
                 {
                     await WaitBeforeRetry(currentRetry, retryOptions);
                     await func.Invoke();
+                    break;
                 }
                 catch (Exception ex)
                 {

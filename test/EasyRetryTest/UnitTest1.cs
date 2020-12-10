@@ -39,6 +39,21 @@ namespace EasyRetryTest
 
         private async Task Task_NetworkBound_With_Await()
         {
+            await new HttpClient().GetStringAsync("https://dotnetfoundation.org");
+        }
+
+        [Test]
+        public async Task TestSuccessAsyncFunctionCallWithAwait()
+        {
+            await _easyRetry.Retry(async () => await Task_NetworkBound_With_Await(), new RetryOptions()
+            {
+                EnableLogging = true,
+                Attempts = 3
+            });
+        }
+
+        private async Task Task_Doomed_NetworkBound_With_Await()
+        {
             await new HttpClient().GetStringAsync("https://dotnetfoundation2222222hh2h222.org");
         }
 
@@ -47,7 +62,7 @@ namespace EasyRetryTest
         {
             Assert.ThrowsAsync<HttpRequestException>(async () =>
             {
-                await _easyRetry.Retry(async () => await Task_NetworkBound_With_Await(), new RetryOptions()
+                await _easyRetry.Retry(async () => await Task_Doomed_NetworkBound_With_Await(), new RetryOptions()
                 {
                     EnableLogging = true,
                     Attempts = 3
@@ -57,6 +72,11 @@ namespace EasyRetryTest
 
         private Task Task_NetworkBound()
         {
+            return new HttpClient().GetStringAsync("https://dotnetfoundation.org");
+        }
+
+        private Task Task_Doomed_NetworkBound()
+        {
             return new HttpClient().GetStringAsync("https://dotnetfoundation2222222hh2h222.org");
         }
 
@@ -65,8 +85,25 @@ namespace EasyRetryTest
         {
             Assert.ThrowsAsync<HttpRequestException>(async () =>
             {
-                await new EasyRetry.EasyRetry().Retry(async () => await Task_NetworkBound());
+                await new EasyRetry.EasyRetry().Retry(async () => await Task_Doomed_NetworkBound());
             });
+        }
+
+        [Test]
+        public async Task TestSuccessAsyncFunctionCallFullOptions()
+        {
+            await _easyRetry.Retry(async () => await Task_NetworkBound()
+                , new RetryOptions()
+                {
+                    Attempts = 3,
+                    DelayBetweenRetries = TimeSpan.FromSeconds(3),
+                    DelayBeforeFirstTry = TimeSpan.FromSeconds(2),
+                    EnableLogging = true,
+                    DoNotRetryOnTheseExceptionTypes = new List<Type>()
+                    {
+                        typeof(NullReferenceException)
+                    }
+                });
         }
 
         [Test]
@@ -74,7 +111,7 @@ namespace EasyRetryTest
         {
             Assert.ThrowsAsync<HttpRequestException>(async () =>
             {
-                await _easyRetry.Retry(async () => await Task_NetworkBound()
+                await _easyRetry.Retry(async () => await Task_Doomed_NetworkBound()
                     , new RetryOptions()
                     {
                         Attempts = 3,
