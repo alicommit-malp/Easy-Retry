@@ -29,7 +29,8 @@ does not equal `PackageVersion`, and pushes the `.nupkg` and `.snupkg` to nuget.
 Publishing: `NuGet/login@v1` exchanges the job's GitHub OIDC token (`id-token: write`) for a one-hour API
 key, so there is no long-lived NuGet key anywhere. Requirements outside the repo: a Trusted Publishing
 policy on nuget.org (owner `alicommit-malp`, repository `Easy-Retry`, workflow file `ci.yml`, environment
-`nuget` optional) and a GitHub Actions secret `NUGET_USER` holding the nuget.org profile name.
+`nuget` optional). The `user` input of `NuGet/login` is the nuget.org profile name that owns the package,
+`AliTabryzy`, written directly in the workflow because a profile name is public.
 
 ## Architecture
 
