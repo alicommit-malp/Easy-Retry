@@ -239,6 +239,3 @@ _Pvt_Extensions
 # FAKE - F# Make
 .fake/
 /api/ctw.backend.microservice.account.api/LogFiles/
-
-# Agent guidance is kept in memory, not in the repo
-CLAUDE.md
