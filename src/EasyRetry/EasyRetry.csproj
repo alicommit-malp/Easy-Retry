@@ -1,27 +1,37 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
     <LangVersion>latest</LangVersion>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Title>Easily retry your asynchronous operation </Title>
+    <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageId>EasyRetry</PackageId>
+    <PackageVersion>2.2.0</PackageVersion>
+    <Authors>Ali Alp</Authors>
+    <Title>Easily retry your asynchronous operation</Title>
     <Description>Easily retry your asynchronous operation</Description>
-    <license>MIT</license>
-    <Copyright>Null</Copyright>
+    <Copyright>Copyright (c) Ali Alp</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/alicommit-malp/Easy-Retry</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/alicommit-malp/Easy-Retry/blob/master/LICENSE</PackageLicenseUrl>
     <RepositoryUrl>https://github.com/alicommit-malp/Easy-Retry</RepositoryUrl>
-    <RepositoryType>GIT</RepositoryType>
-    <PackageTags>Async Task Retry Asynchronous </PackageTags>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-    <PackageVersion>2.0.1</PackageVersion>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>Async;Task;Retry;Asynchronous;Backoff</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PackageReleaseNotes>See https://github.com/alicommit-malp/Easy-Retry/releases</PackageReleaseNotes>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="EasyRetryTaskExtension.cs" />
+    <None Include="../../README.md" Pack="true" PackagePath="/" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.7" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.3" />
   </ItemGroup>
 
 </Project>
