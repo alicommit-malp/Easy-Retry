@@ -30,14 +30,19 @@ private async Task Task_NetworkBound()
 In order to retry it once, after 5 seconds, you just need to do as follows
 
 ```c#
+using EasyRetry;
+using Retrier = EasyRetry.EasyRetry;   // the class shares its name with the namespace
+
 //With DI
-services.AddSingleton<IEasyRetry, EasyRetry>();
+services.AddSingleton<IEasyRetry, Retrier>();
 ...
 await _easyRetry.Retry(async () => await Task_NetworkBound());
 
 //Without DI
-await new EasyRetry().Retry(async () => await Task_NetworkBound());
+await new Retrier().Retry(async () => await Task_NetworkBound());
 ```
+
+All examples below assume those two `using` lines.
 
 The `Func<Task<T>>` overload returns the value of the first successful attempt
 
@@ -139,7 +144,7 @@ Pass a `CancellationToken` through `RetryOptions.CancellationToken`. When the to
 There is an `Action` overload for code that is not async
 
 ```c#
-new EasyRetry().Retry(() => File.Copy(source, destination), new RetryOptions()
+new Retrier().Retry(() => File.Copy(source, destination), new RetryOptions()
 {
     Attempts = 3,
     DelayBetweenRetries = TimeSpan.FromMilliseconds(500)
@@ -169,7 +174,7 @@ catch (HttpRequestException ex)
 Construct `EasyRetry` with an `ILogger<EasyRetry>` (the DI registration above does this for you) and set `EnableLogging = true` in the options. Each failed attempt that will be retried is logged at `Warning`, the final failure at `Error`, both with the exception attached. Without a logger, or with `EnableLogging = false`, nothing is logged.
 
 ```c#
-var easyRetry = new EasyRetry(loggerFactory.CreateLogger<EasyRetry>());
+var easyRetry = new Retrier(loggerFactory.CreateLogger<Retrier>());
 await easyRetry.Retry(async () => await Task_NetworkBound(), new RetryOptions { EnableLogging = true });
 ```
 
@@ -190,10 +195,10 @@ var o = RetryOptions.Exponential(5, TimeSpan.FromSeconds(1));
 o.EnableLogging = true;
 ```
 
-For scripts and one-off code there is `EasyRetry.Default`, a shared instance without logging
+For scripts and one-off code there is `Retrier.Default`, a shared instance without logging
 
 ```c#
-await EasyRetry.Default.Retry(() => DoThing());
+await Retrier.Default.Retry(() => DoThing());
 ```
 
 ## Changelog
@@ -208,7 +213,7 @@ All additive; no behaviour change for existing code.
 - `OnRetry` hook for metrics and tracing.
 - `DelayOverride` for server-provided delays such as Retry-After.
 - `RetryOptions.Constant` / `Linear` / `Exponential` presets.
-- `EasyRetry.Default` shared instance.
+- `EasyRetry.Default` shared instance (`Retrier.Default` with the alias above).
 
 ### 2.1.0
 
